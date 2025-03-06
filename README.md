@@ -4,12 +4,9 @@
 Cuando ejecutas un juego, gran parte del procesamiento se realiza en la CPU, como los cálculos lógicos, gameplay, etc.; sin embargo, cuando se trata de renderizar la escena (por ejemplo, al llamar a `glDrawElements()`), la GPU entra en acción. La GPU presenta los objetos en pantalla y determina exactamente cómo se muestran: su color, textura, posición, escala, iluminación, sombras, efectos de niebla, entre otros aspectos.
 
 ### Evolución de OpenGL
-En el antiguo OpenGL con la tubería de función fija (fixed-function pipeline), existía una lista limitada de funciones predefinidas para controlar cómo la GPU renderizaba los objetos. Este enfoque era más simplificado y fácil de implementar, pero resultaba muy limitado y ofrecía poco margen de maniobra para los desarrolladores.
+En el antiguo OpenGL con la tubería de función fija ([fixed-function pipeline](https://www.khronos.org/opengl/wiki/Fixed_Function_Pipeline)), existía una lista limitada de funciones predefinidas para controlar cómo la GPU renderizaba los objetos. Este enfoque era más simplificado y fácil de implementar, pero resultaba muy limitado y ofrecía poco margen de maniobra para los desarrolladores.
 
-En contraste, el OpenGL moderno utiliza una tubería programable donde esas funciones fijas han desaparecido, permitiéndonos programar la GPU directamente. Esto significa que debemos crear nuestras propias funciones de iluminación y otros efectos, lo que nos brinda total flexibilidad. Estos programas que creamos y ejecutamos en la GPU se denominan **shaders** y se escriben en el lenguaje GLSL (OpenGL Shading Language).
-Sistema de coordenadas en OpenGL
-
-En el sistema de coordenadas de OpenGL, el origen es el centro (0,0), (0,1) es el borde superior, (0,-1) es el borde inferior, (-1,0) corresponde al borde izquierdo y (1,0) al borde derecho. Debido a que estamos trabajando en 3D, el eje z apunta hacia el observador, saliendo de la pantalla. Este sistema de coordenadas es fundamental para entender cómo el Vertex Shader transforma las posiciones de los vértices al renderizarlos en pantalla.
+En contraste, el OpenGL moderno utiliza una tubería programable donde esas funciones fijas han desaparecido, permitiéndonos programar la GPU directamente. Esto significa que debemos crear nuestras propias funciones de iluminación y otros efectos, lo que nos brinda total flexibilidad. Estos programas que creamos y ejecutamos en la GPU se denominan **shaders** y se escriben en el lenguaje [GLSL](https://en.wikipedia.org/wiki/OpenGL_Shading_Language) (OpenGL Shading Language).
 
 ### Tipos principales de Shaders
 Hay dos tipos de shaders fundamentales que trabajan juntos para renderizar una escena:
@@ -17,9 +14,8 @@ Hay dos tipos de shaders fundamentales que trabajan juntos para renderizar una e
 #### 1. Vertex Shader
 El Vertex Shader se ejecuta **una vez para cada vértice** en el objeto que se está renderizando. Utiliza como entrada los datos de vértice almacenados en el VAO (como posición, normales, coordenadas de textura, etc.) del vértice que está procesando actualmente.
 El Vertex Shader debe realizar dos tareas principales:
-
-Determinar la posición donde el vértice se renderizará en la pantalla (mediante la variable especial `gl_Position`).
-Procesar cualquier otro dato requerido y preparar las salidas que servirán como entradas al Fragment Shader.
+- Determinar la posición donde el vértice se renderizará en la pantalla (mediante la variable especial `gl_Position`).
+- Procesar cualquier otro dato requerido y preparar las salidas que servirán como entradas al Fragment Shader.
 
 Las salidas del Vertex Shader pueden ser cualquier cosa que programemos: valores flotantes, vectores 2D o 3D, o cualquier combinación de vectores y matrices.
 
@@ -50,19 +46,19 @@ Es importante destacar la diferencia en la frecuencia de ejecución: mientras el
 Esta arquitectura programable es lo que hace que el renderizado moderno sea tan flexible y potente, permitiendo a los desarrolladores crear efectos visuales complejos y personalizados.
 
 ## VBO, VAO & EBO
-Los objetos de matriz de vértices, Vertex Array Objects (VAO) en inglés, son la forma moderna de almacenar y representar modelos en OpenGL, reemplazando la lista de visualización antigua y el modo inmediato. Un VAO es un objeto para almacenar datos sobre un modelo 3D.
+Los objetos VAO (Vertex Array Objects), son la forma moderna de almacenar y representar modelos en OpenGL, reemplazando la lista de visualización antigua y el modo inmediato. Un VAO es un objeto para almacenar datos sobre un modelo 3D.
 
-El VAO tiene múltiples espacios para almacenar estos datos, conocidos como listas de atributos. En uno de estos espacios puede almacenar todas las posiciones de los vértices, en otro puede almacenar todos los colores, los vectores normales, o las coordenadas de textura de cada vértice. Estos conjuntos de datos se almacenan en las listas de atributos como Objetos de Buffer de Vértices, Vertex Buffer Objects (VBO) en inglés.
+El VAO tiene múltiples espacios para almacenar estos datos, conocidos como listas de atributos. En uno de estos espacios puede almacenar todas las posiciones de los vértices, en otro puede almacenar todos los colores, los vectores normales, o las coordenadas de textura de cada vértice. Estos conjuntos de datos se almacenan en las listas de atributos como VBO (Vertex Buffer Objects).
+
 Un VBO es simplemente un contenedor de datos, puede visualizarlo como un conjunto de números que pueden representar cualquier información: posiciones, colores, normales, etc. Cada VBO se puede vincular a una lista de atributos específica en el VAO.
 
 Otro componente importante en el sistema de renderizado moderno de OpenGL es el EBO (Element Buffer Object), también conocido como IBO (Index Buffer Object). A diferencia de los VBOs que almacenan datos de atributos, un EBO almacena índices que indican a OpenGL qué vértices debe dibujar y en qué orden. Esto permite reutilizar vértices cuando se comparten entre diferentes primitivas (como triángulos), mejorando significativamente la eficiencia de memoria y rendimiento.
 
-¿Cómo accedemos a estos datos cuando los necesitamos? Cada VAO tiene un identificador único (ID), por lo que podemos acceder a él en cualquier momento usando esta ID. Cuando vinculamos un VAO, también se vinculan automáticamente todos los VBOs y EBOs asociados, lo que simplifica enormemente el proceso de renderizado.
+**¿Cómo accedemos a estos datos cuando los necesitamos?** Cada VAO tiene un identificador único (ID), por lo que podemos acceder a él en cualquier momento usando esta ID. Cuando vinculamos un VAO, también se vinculan automáticamente todos los VBOs y EBOs asociados, lo que simplifica enormemente el proceso de renderizado.
 
-¿Pero cómo representamos exactamente un modelo 3D como datos que podríamos almacenar en un VAO? Cada modelo 3D con el que trabajamos está compuesto por múltiples triángulos, y cada triángulo tiene tres vértices o puntos en el espacio tridimensional. Cada vértice tiene una coordenada 3D (X, Y, Z), y si recopilamos las coordenadas de cada vértice de todos los triángulos del modelo, obtendremos una lista de datos que representa todas las posiciones de los vértices del modelo. Estos datos son precisamente lo que podemos colocar en un VBO y almacenar en una lista de atributos de un VAO.
+**¿Pero cómo representamos exactamente un modelo 3D como datos que podríamos almacenar en un VAO?** Cada modelo 3D con el que trabajamos está compuesto por múltiples triángulos, y cada triángulo tiene tres vértices o puntos en el espacio tridimensional. Cada vértice tiene una coordenada 3D (X, Y, Z), y si recopilamos las coordenadas de cada vértice de todos los triángulos del modelo, obtendremos una lista de datos que representa todas las posiciones de los vértices del modelo. Estos datos son precisamente lo que podemos colocar en un VBO y almacenar en una lista de atributos de un VAO.
 
 Un ejemplo sencillo sería renderizar un rectángulo compuesto por dos triángulos. Sin usar EBO, necesitaríamos definir 6 vértices (3 para cada triángulo). El proceso sería:
-
 1. Crear un VBO con las posiciones de los 6 vértices
 2. Cargar los datos en el VBO
 3. Crear un VAO
@@ -70,7 +66,6 @@ Un ejemplo sencillo sería renderizar un rectángulo compuesto por dos triángul
 5. Utilizar el ID del VAO para indicarle a OpenGL que renderice el rectángulo en pantalla
 
 Pero con un EBO, podemos optimizar este proceso:
-
 1. Crear un VBO con las posiciones de solo 4 vértices (las esquinas del rectángulo)
 2. Crear un EBO con los índices que indican cómo formar los dos triángulos (por ejemplo, [0,1,2, 2,3,0])
 3. Crear un VAO y vincular tanto el VBO como el EBO
