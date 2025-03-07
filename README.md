@@ -15,6 +15,8 @@ En sistemas modernos como OpenGL, todo se trabaja en un espacio 3D, incluso cuan
 #### Etapas del Pipeline Gráfico
 El pipeline gráfico toma como entrada un conjunto de coordenadas 3D y las transforma en píxeles 2D coloreados en la pantalla. Este pipeline se divide en varias etapas especializadas que pueden ejecutarse en paralelo, lo que explica por qué las tarjetas gráficas modernas tienen miles de pequeños núcleos de procesamiento para procesar datos rápidamente.
 
+![](pipeline%20grafico.PNG)
+
 ##### 1. Datos de Entrada (`Vertex Data[]`)
 El pipeline recibe como entrada una lista de vértices (Vertex Data). Un vértice es una colección de datos por coordenada 3D, que puede incluir posición, color, coordenadas de textura, normales, etc. OpenGL necesita saber qué tipo de primitivas queremos formar con estos datos (puntos, líneas, triángulos) mediante indicadores como GL_POINTS, GL_TRIANGLES o GL_LINE_STRIP.
 
