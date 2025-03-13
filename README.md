@@ -79,15 +79,15 @@ La respuesta es la **interpolación lineal**. Para cada píxel, el Fragment Shad
 - Un píxel ubicado dentro de un triángulo recibirá una mezcla ponderada de los valores de los tres vértices según su distancia relativa a cada uno.
 
 ### Ejemplo práctico
-Consideremos un rectángulo con cuatro vértices almacenados en un VAO:
+Consideremos un cuadrado con cuatro vértices almacenados en un VAO:
 1. El Vertex Shader se ejecutará cuatro veces (una por cada vértice) y para cada uno:
    - Definirá dónde se renderizará ese vértice en la pantalla mediante `gl_Position`.
    - Calculará un color basado en la posición del vértice (por ejemplo, estableciendo el componente rojo como `position.x + 0.5`, el verde como `1.0` y el azul como `position.y + 0.5`).
-2. El Fragment Shader se ejecutará miles de veces (una por cada píxel que cubre el rectángulo) y para cada ejecución:
+2. El Fragment Shader se ejecutará miles de veces (una por cada píxel que cubre el cuadrado) y para cada ejecución:
    - Recibirá un color interpolado linealmente de los colores producidos por el Vertex Shader.
    - Procesará este color de entrada según su programación para determinar el color final del píxel.
 
-Es importante destacar la diferencia en la frecuencia de ejecución: mientras el Vertex Shader se ejecuta solo cuatro veces para nuestro rectángulo, el Fragment Shader podría ejecutarse miles de veces, dependiendo del tamaño del rectángulo en pantalla.
+Es importante destacar la diferencia en la frecuencia de ejecución: mientras el Vertex Shader se ejecuta solo cuatro veces para nuestro cuadrado, el Fragment Shader podría ejecutarse miles de veces, dependiendo del tamaño del cuadrado en pantalla.
 
 Esta arquitectura programable es lo que hace que el renderizado moderno sea tan flexible y potente, permitiendo a los desarrolladores crear efectos visuales complejos y personalizados.
 
@@ -104,15 +104,21 @@ Otro componente importante en el sistema de renderizado moderno de OpenGL es el 
 
 **¿Pero cómo representamos exactamente un modelo 3D como datos que podríamos almacenar en un VAO?** Cada modelo 3D con el que trabajamos está compuesto por múltiples triángulos, y cada triángulo tiene tres vértices o puntos en el espacio tridimensional. Cada vértice tiene una coordenada 3D (X, Y, Z), y si recopilamos las coordenadas de cada vértice de todos los triángulos del modelo, obtendremos una lista de datos que representa todas las posiciones de los vértices del modelo. Estos datos son precisamente lo que podemos colocar en un VBO y almacenar en una lista de atributos de un VAO.
 
-Un ejemplo sencillo sería renderizar un rectángulo compuesto por dos triángulos. Sin usar EBO, necesitaríamos definir 6 vértices (3 para cada triángulo). El proceso sería:
+Un ejemplo sencillo sería renderizar un cuadrado compuesto por dos triángulos. Sin usar EBO, necesitaríamos definir 6 vértices (3 para cada triángulo). El proceso sería:
 1. Crear un VBO con las posiciones de los 6 vértices
 2. Cargar los datos en el VBO
 3. Crear un VAO
 4. Vincular el VBO a una de las listas de atributos del VAO
-5. Utilizar el ID del VAO para indicarle a OpenGL que renderice el rectángulo en pantalla
+5. Utilizar el ID del VAO para indicarle a OpenGL que renderice el cuadrado en pantalla
 
 Pero con un EBO, podemos optimizar este proceso:
-1. Crear un VBO con las posiciones de solo 4 vértices (las esquinas del rectángulo)
+1. Crear un VBO con las posiciones de solo 4 vértices (las esquinas del cuadrado), en donde el vertice 0 se ubica en la esquina inferior derecha, el vertice 1 en la esquina superior izquierda, el vertice 2 en la esquina superior derecha y el vertice 3 en la esquina inferior izquierda.
+```
+ v1 x--------x v2
+    |        |
+    |        |
+ v3 x--------x v0
+```
 2. Crear un EBO con los índices que indican cómo formar los dos triángulos, y es importante que **esten en orden antihorario**, por ejemplo, [2,1,0,0,1,3]
 3. Crear un VAO y vincular tanto el VBO como el EBO
 4. Al momento de renderizar, OpenGL utilizará los índices del EBO para determinar qué vértices dibujar
