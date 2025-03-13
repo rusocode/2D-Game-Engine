@@ -35,7 +35,7 @@ El pipeline recibe una lista de vértices, donde cada vértice contiene datos co
 #### 2. Vertex Shader
 Primera etapa programable del pipeline. Toma un vértice como entrada y transforma sus coordenadas 3D mediante [matrices de transformación](https://www.scratchapixel.com/lessons/mathematics-physics-for-computer-graphics/geometry/matrices.html), realizando procesamiento básico en sus atributos.
 
-Para empezar a dibujar algo, primero debemos proporcionar a OpenGL datos de vértices de entrada. OpenGL es una biblioteca de gráficos 3D, por lo que todas las coordenadas que especificamos en OpenGL son 3D (coordenadas x, y, z). OpenGL no transforma simplemente todas las coordenadas 3D a píxeles 2D en la pantalla; solo procesa las coordenadas 3D cuando se encuentran en un rango específico entre -1.0 y 1.0 en los tres ejes (x, y, z). Todas las coordenadas dentro de este rango, denominado **coordenadas del dispositivo normalizadas (NDC)**, serán visibles en la pantalla (pero no así las coordenadas fuera de esta región).
+Para comenzar a dibujar con OpenGL, primero debemos proporcionar datos de vértices como entrada. OpenGL es una biblioteca de gráficos 3D, por lo que todas las coordenadas que especificamos son tridimensionales (x, y, z). Sin embargo, OpenGL no transforma directamente todas estas coordenadas 3D en píxeles 2D en la pantalla; solo procesa aquellas coordenadas que se encuentran dentro de un rango específico: entre -1.0 y 1.0 en los tres ejes. Este rango se conoce como **coordenadas del dispositivo normalizadas** (NDC), y solo los elementos dentro de este espacio serán visibles en la pantalla. Este sistema de coordenadas normalizadas facilita el trabajo de la GPU, ya que permite realizar cálculos de manera más eficiente al operar con valores en un rango estandarizado.
 
 #### 3. Geometry Shader (Opcional)
 Recibe una colección de vértices que forman una primitiva y puede generar nuevas formas emitiendo nuevos vértices.
@@ -98,15 +98,12 @@ También conocido como Index Buffer Object (IBO), almacena índices que indican 
 
 ### Sistema de Coordenadas OpenGL
 
-Antes de entrar en detalle de como aplicar la optimizacion de renderizado utlizando indices para representar a los vertices, necesitamos saber que OpenGL utiliza un sistema de coordenadas cartesianas 3D conocido como "sistema de coordenadas diestro" (right-handed coordinate system), en donde el eje **x** positivo apunta hacia la derecha, el eje **y** positivo apunta hacia arriba y el eje **z** positivo apunta hacia fuera de la pantalla (hacia el observador). 
+Antes de entrar en detalle de como aplicar la optimizacion de renderizado utlizando indices para representar los vertices, necesitamos saber que OpenGL utiliza un sistema de coordenadas cartesianas 3D conocido como "sistema de coordenadas diestro" (right-handed coordinate system), en donde el eje **x** positivo apunta hacia la derecha, el eje **y** positivo apunta hacia arriba y el eje **z** positivo apunta hacia fuera de la pantalla (hacia el observador). 
 
-Como las coordenadas del dispositivo normalizadas van de -1.0 a 1.0, el vertice 0 (que se utiliza como ejemplo para especificar la esquina inferior derecha del cuadrado) normalizado se representa como `0.5f, -0.5f, 0.0f`, el vertice 1 como `-0.5f, 0.5f, 0.0f`, el vertice 2 como `0.5f, 0.5f, 0.0f` y el vertice 3 como `-0.5f, -0.5f, 0.0f`. Juntos forman un cuadrado en el centro del sistema de coordenadas de OpenGL:
-   ```
-    v1 x--------x v2
-       |        |
-       |        |
-    v3 x--------x v0
-   ```
+Como las coordenadas del dispositivo normalizadas van de -1.0 a 1.0, el vertice 0 (que se utiliza como ejemplo para especificar la esquina inferior derecha del cuadrado) normalizado se representa como `0.5f, -0.5f`, el vertice 1 como `-0.5f, 0.5f`, el vertice 2 como `0.5f, 0.5f` y el vertice 3 como `-0.5f, -0.5f`. Juntos forman un cuadrado en el centro del sistema de coordenadas de OpenGL:
+
+![](ndc2.PNG)
+
 Las coordenadas NDC se transformarán en coordenadas de espacio de pantalla (screen-space coordinates) mediante la transformación de la ventana gráfica (viewport transform), utilizando los datos proporcionados `glViewport`. Las coordenadas de espacio de pantalla resultantes se transforman en fragmentos como entrada para el sombreador de fragmentos.
 
 Ahora que tenemos esto claro, veamos el problema de la duplicacion de vertices y como solucionarlo utilizando indices.
