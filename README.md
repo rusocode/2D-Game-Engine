@@ -100,9 +100,15 @@ Un VBO es simplemente un contenedor de datos, puede visualizarlo como un conjunt
 
 Otro componente importante en el sistema de renderizado moderno de OpenGL es el EBO (Element Buffer Object), también conocido como IBO (Index Buffer Object). A diferencia de los VBOs que almacenan datos de atributos, un EBO almacena índices que indican a OpenGL qué vértices debe dibujar y en qué orden. Esto permite reutilizar vértices cuando se comparten entre diferentes primitivas (como triángulos), mejorando significativamente la eficiencia de memoria y rendimiento.
 
-**¿Cómo accedemos a estos datos cuando los necesitamos?** Cada VAO tiene un identificador único (ID), por lo que podemos acceder a él en cualquier momento usando esta ID. Cuando vinculamos un VAO, también se vinculan automáticamente todos los VBOs y EBOs asociados, lo que simplifica enormemente el proceso de renderizado.
+**¿Cómo accedemos a estos datos cuando los necesitamos?**
 
-**¿Pero cómo representamos exactamente un modelo 3D como datos que podríamos almacenar en un VAO?** Cada modelo 3D con el que trabajamos está compuesto por múltiples triángulos, y cada triángulo tiene tres vértices o puntos en el espacio tridimensional. Cada vértice tiene una coordenada 3D (X, Y, Z), y si recopilamos las coordenadas de cada vértice de todos los triángulos del modelo, obtendremos una lista de datos que representa todas las posiciones de los vértices del modelo. Estos datos son precisamente lo que podemos colocar en un VBO y almacenar en una lista de atributos de un VAO.
+Cada VAO tiene un identificador único (ID), por lo que podemos acceder a él en cualquier momento usando esta ID. Cuando vinculamos un VAO, también se vinculan automáticamente todos los VBOs y EBOs asociados, lo que simplifica enormemente el proceso de renderizado.
+
+**¿Pero cómo representamos exactamente un modelo 3D como datos que podríamos almacenar en un VAO?**
+
+Cada modelo 3D con el que trabajamos está compuesto por múltiples triángulos, y cada triángulo tiene tres vértices o puntos en el espacio tridimensional. Cada vértice tiene una coordenada 3D (X, Y, Z), y si recopilamos las coordenadas de cada vértice de todos los triángulos del modelo, obtendremos una lista de datos que representa todas las posiciones de los vértices del modelo. Estos datos son precisamente lo que podemos colocar en un VBO y almacenar en una lista de atributos de un VAO.
+
+OpenGL utiliza un sistema de coordenadas cartesianas 3D conocido como "sistema de coordenadas diestro" (right-handed coordinate system), en donde el eje **x** positivo apunta hacia la derecha, el eje **y** positivo apunta hacia arriba y el eje **z** positivo apunta hacia fuera de la pantalla (hacia el observador). En OpenGL, las coordenadas de dispositivo normalizadas (NDC) van de -1.0 a 1.0. Por lo tanto, el vertice 0 (que se utiliza como ejemplo para especificar la esquina inferior derecha del cuadrado) normalizado se representa como `0.5f, -0.5f, 0.0f`, el vertice 1 como `-0.5f, 0.5f, 0.0f`, el vertice 2 como `0.5f, 0.5f, 0.0f` y el vertice 3 como `-0.5f, -0.5f, 0.0f`, y como estamos trabajando con gráficos 2D dentro de un entorno OpenGL, la coordenada z se tiene que especificar, pero con un valor 0. Juntos forman un cuadrado en el centro del sistema de coordenadas de OpenGL.
 
 Un ejemplo sencillo sería renderizar un cuadrado compuesto por dos triángulos. Sin usar EBO, necesitaríamos definir 6 vértices (3 para cada triángulo). El proceso sería:
 1. Crear un VBO con las posiciones de los 6 vértices
@@ -128,13 +134,13 @@ El VAO es fundamental porque mantiene todo el estado relacionado con los datos d
 ## Index Buffers
 
 ### Problema de la representación directa de vértices
-Supongamos que tenemos 4 vértices para representar un rectángulo, donde:
+Supongamos que tenemos 4 vértices para representar un cuadrado, donde:
 - V0 está ubicado en (0.5, -0.5, 0) - Esquina inferior derecha
 - V1 en (-0.5, 0.5, 0) - Esquina superior izquierda
 - V2 en (0.5, 0.5, 0) - Esquina superior derecha
 - V3 en (-0.5, -0.5, 0) - Esquina inferior izquierda
 
-Para dibujar este rectángulo, necesitamos dividirlo en dos triángulos:
+Para dibujar este cuadrado, necesitamos dividirlo en dos triángulos:
 1. El triángulo superior derecho, formado por los vértices V2, V1 y V0 (en ese orden)
 2. El triángulo inferior izquierdo, formado por los vértices V0, V1 y V3 (en ese orden)
 
