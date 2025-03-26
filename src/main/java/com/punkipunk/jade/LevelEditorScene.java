@@ -12,23 +12,29 @@ import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 
 public class LevelEditorScene extends Scene {
 
+    /* Como queremos renderizar un solo cuadrado, especificamos un total de 4 vertices, cada uno con una posicion 3D y color. Los
+     * definimos en coordenadas de dispositivo normalizadas (la region visible de OpenGL) en una matriz flotante: */
     private final float[] vertexArray = {
-            // position               // color
-            0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, // Bottom right 0
-            -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, // Top left     1
-            0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, // Top right     2
-            -0.5f, -0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, // Bottom left 3
+            // Posicion               // Color
+            0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, // Esquina inferior derecha (0)
+            -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, // Esquina superior izquierda (1)
+            0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, // Esquina superior derecha (2)
+            -0.5f, -0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, // Esquina inferior izquierda (3)
     };
-    // IMPORTANTE: Debe estar en orden antihorario
+
+    /* Dado que OpenGL funciona en 3D, renderizamos un cuadrado 2D con cada vertice en una coordenada z de 0.0. De esta forma, la
+     * profundidad del cuadrado se mantiene, dandole la apariencia de un cuadrado 2D. */
+
+    // IMPORTANTE: Los indices de los vertices deben estar en orden antihorario
+    /*
+                v1 x--------x v2
+                   |        |
+                   |        |
+               v3 x--------x v0
+    */
     private final int[] elementArray = {
-            /*
-                    x        x
-
-
-                    x        x
-             */
-            2, 1, 0, // Top right triangle
-            0, 1, 3 // bottom left triangle
+            2, 1, 0, // Triangulo superior derecho
+            0, 1, 3 // Triangulo inferior izquierdo
     };
 
 
@@ -42,12 +48,12 @@ public class LevelEditorScene extends Scene {
     @Override
     public void init() {
 
-        // Inicializa y compila el shader
+        // Inicializa y compila los shaders
         shader = new Shader("shaders/vertexShader.glsl", "shaders/fragmentShader.glsl");
         shader.compile();
 
         // ============================================================
-        // Genera VAO, VBO y EBO buffer objects, y los envia a la GPU
+        // Genera VAO, VBO y EBO, y los envia a la GPU
         // ============================================================
         vaoID = glGenVertexArrays();
         glBindVertexArray(vaoID);
@@ -78,13 +84,13 @@ public class LevelEditorScene extends Scene {
         int floatSizeBytes = Float.BYTES;
         int vertexSizeBytes = (positionsSize + colorSize) * floatSizeBytes;
         /* El primer parametro especifica que atributo de vertice queremos configurar. Recuerde que especificamos la ubicacion del
-         * atributo de vertice de posicion en el vertex shader con layout (location = 0). Esto establece la ubicación del atributo
+         * atributo de vertice de posicion en el vertex shader con layout (location = 0). Esto establece la ubicacion del atributo
          * de vertice en 0 y, dado que queremos pasar datos a este atributo de vertice, pasamos 0. El tercer argumento especifica
          * el tipo de datos que es GL_FLOAT (un vec* en GLSL consiste en valores de punto flotante).
          *
          * El quinto argumento se conoce como stride y nos indica el espacio entre atributos de vertice consecutivos. Dado que el
          * siguiente conjunto de datos de posicion se encuentra exactamente a 7 veces el tamaño de un punto flotante,
-         * especificamos ese valor como paso. Como en este caso, la matriz no esta compacta, no podemos especificar el sride como
+         * especificamos ese valor como paso. Como en este caso, la matriz no esta compacta, no podemos especificar el stride como
          * 0 para permitir que OpenGL determine el stride (esto solo funciona cuando los valores estan compactados). Siempre que
          * tengamos mas atributos de vertice, debemos definir cuidadosamente el espaciado entre cada atributo de vertice. */
         glVertexAttribPointer(0, positionsSize, GL_FLOAT, false, vertexSizeBytes, 0); // Establece el puntero del primer layout (aPos)

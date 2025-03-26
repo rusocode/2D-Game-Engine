@@ -16,13 +16,13 @@ public class ResourceLoader {
     /**
      * Carga un recurso como texto.
      *
-     * @param resourcePath ruta al recurso relativa a la carpeta resources
-     * @return contenido del archivo como string
+     * @param resourceName nombre del recurso
+     * @return contenido del recurso como string
      */
-    public static String loadAsString(String resourcePath) {
+    public static String loadAsString(String resourceName) {
         try {
 
-            InputStream inputStream = getInputStream(resourcePath);
+            InputStream inputStream = getInputStream(resourceName);
 
             /* Crea un InputStreamReader con codificacion UTF-8 para manejar correctamente caracteres internacionales. Lo envuelve
              * en un BufferedReader para leer lineas de texto de manera eficiente. Usa el metodo lines() para obtener un Stream de
@@ -33,8 +33,7 @@ public class ResourceLoader {
             }
 
         } catch (IOException e) {
-            System.err.println("No se pudo cargar el recurso: " + resourcePath);
-            e.printStackTrace();
+            System.err.println("The '" + resourceName + "' resource could not be loaded!");
             return null;
         }
     }
@@ -46,15 +45,15 @@ public class ResourceLoader {
      * resources en un proyecto Maven/Gradle) y devuelve un {@code InputStream} para leer su contenido. Si el recurso no existe,
      * devuelve null.
      *
-     * @param resourcePath recurso especificado en el classpath
+     * @param resourceName nombre del recurso
      * @return el recurso como un InputStream
      */
-    private static InputStream getInputStream(String resourcePath) throws IOException {
-        // Obtiene el ClassLoader asociado a la clase ResourceLoader
+    private static InputStream getInputStream(String resourceName) throws IOException {
+        // Obtiene el ClassLoader asociado a esta clase
         ClassLoader classLoader = ResourceLoader.class.getClassLoader();
         // Obtiene el recurso como un InputStream
-        InputStream inputStream = classLoader.getResourceAsStream(resourcePath);
-        if (inputStream == null) throw new IOException("No se pudo encontrar el recurso: " + resourcePath);
+        InputStream inputStream = classLoader.getResourceAsStream(resourceName);
+        if (inputStream == null) throw new IOException("The '" + resourceName + "' resource could not be found!");
         return inputStream;
     }
 

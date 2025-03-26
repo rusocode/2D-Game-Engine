@@ -21,10 +21,10 @@ public class Shader {
     public Shader(String vertexPath, String fragmentPath) {
         this.vertexPath = vertexPath;
         this.fragmentPath = fragmentPath;
-        // Cargar los archivos de shaders
+        // Carga los shaders
         vertexSource = ResourceLoader.loadAsString(vertexPath);
         fragmentSource = ResourceLoader.loadAsString(fragmentPath);
-        assert vertexSource != null && fragmentSource != null : "Error: No se pudo abrir los archivos de shader: " + vertexPath + " o " + fragmentPath;
+        assert vertexSource != null && fragmentSource != null : "The shaders files could not be loaded!";
     }
 
     public void compile() {
